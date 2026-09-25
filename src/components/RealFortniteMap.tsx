@@ -99,16 +99,16 @@ function POIMarkers({ visible, pois, theme, zoomLevel }: { visible: boolean; poi
               <circleGeometry args={[iconSize, 32]} />
               <meshBasicMaterial color={poi.color} />
             </mesh>
-            <Html distanceFactor={100} position={[0, 0.1, 0]}>
+            <Html distanceFactor={100} position={[0, 0.08, 0]}>
               <div style={{
                 color: poi.color,
-                fontSize: `${textSize}px`,
+                fontSize: `${textSize - 4}px`,
                 fontWeight: 'bold',
                 textAlign: 'center',
-                textShadow: '1px 1px 2px black, -1px -1px 2px black, 1px -1px 2px black, -1px 1px 2px black',
+                textShadow: '1px 1px 1px black',
                 backgroundColor: 'rgba(0,0,0,0.6)',
-                padding: '2px 6px',
-                borderRadius: '4px',
+                padding: '1px 4px',
+                borderRadius: '3px',
                 transform: 'translateX(-50%)',
               }}>
                 {poi.name}
@@ -155,16 +155,16 @@ function PlayerDot({ player, selected, zoomLevel }: { player: PlayerState; selec
         </mesh>
       </group>
       {selected && zoomLevel > 1 && (
-        <Html distanceFactor={100} position={[position[0], 0.08, position[2]]}>
+        <Html distanceFactor={100} position={[position[0], 0.06, position[2]]}>
           <div style={{
             color: '#ffffff',
-            fontSize: '11px',
+            fontSize: '9px',
             fontWeight: 'bold',
             textAlign: 'center',
-            textShadow: '1px 1px 2px black',
+            textShadow: '1px 1px 1px black',
             backgroundColor: 'rgba(0,0,0,0.7)',
-            padding: '2px 8px',
-            borderRadius: '4px',
+            padding: '1px 6px',
+            borderRadius: '3px',
             transform: 'translateX(-50%)',
           }}>
             {player.name || getFallbackPlayerName(player.id)}
@@ -202,13 +202,13 @@ function StormCircle({ circle, visible, theme }: { circle?: StormCircle; visible
         <ringGeometry args={[radius - 0.002, radius + 0.002, 128]} />
         <meshBasicMaterial color="#41c9ff" transparent opacity={0.8} side={THREE.DoubleSide} />
       </mesh>
-      <Html distanceFactor={100} position={[position[0], 0.04, position[2]]}>
+      <Html distanceFactor={100} position={[position[0], 0.03, position[2]]}>
         <div style={{
           color: '#c18cff',
-          fontSize: '14px',
+          fontSize: '11px',
           fontWeight: 'bold',
           textAlign: 'center',
-          textShadow: '1px 1px 2px black',
+          textShadow: '1px 1px 1px black',
         }}>
           ZONE {circle.phase + 1}
         </div>
@@ -240,15 +240,15 @@ function KillMarkers({ kills, frames, currentTime, visible, zoomLevel }: { kills
               <circleGeometry args={[0.02, 16]} />
               <meshBasicMaterial color="#ff3f64" transparent opacity={1 - age} />
             </mesh>
-            <Html distanceFactor={100} position={[0, 0.06, 0]}>
+            <Html distanceFactor={100} position={[0, 0.05, 0]}>
               <div style={{
                 color: '#ff7890',
-                fontSize: '10px',
+                fontSize: '8px',
                 fontWeight: 'bold',
                 textAlign: 'center',
                 textShadow: '1px 1px 1px black',
                 backgroundColor: 'rgba(0,0,0,0.5)',
-                padding: '1px 4px',
+                padding: '1px 3px',
                 borderRadius: '2px',
               }}>
                 {kill.victim || 'Elim'}
