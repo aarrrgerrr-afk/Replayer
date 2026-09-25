@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Header from './Header';
 import PlayerControls from './PlayerControls';
@@ -11,7 +11,22 @@ import Minimap from './Minimap';
 import MapOverlay from './MapOverlay';
 import LiveEventPanel from './LiveEventPanel';
 import MapExplorer from './MapExplorer';
+import EventReplaySystem from './EventReplaySystem';
 import { useReplayStore } from '@/lib/replay-store';
+import { detectLiveEventFromReplayText, type LiveEventId, LIVE_EVENTS } from '@/lib/event-presets';
+
+const EnhancedMap3D = dynamic(() => import('./EnhancedMap3D'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full w-full items-center justify-center bg-fn-darker">
+      <div className="text-center">
+        <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-fn-purple/30 border-t-fn-purple" />
+        <p className="font-medium text-fn-purple">Loading enhanced island...</p>
+        <p className="mt-1 text-sm text-fn-gray">Building 3D terrain, buildings and event layers</p>
+      </div>
+    </div>
+  ),
+});
 
 const Map3D = dynamic(() => import('./Map3D'), {
   ssr: false,
@@ -30,13 +45,47 @@ type SidebarTab = 'players' | 'events';
 
 export default function ReplayViewer() {
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>('players');
-  const { showPlayerList, mapView } = useReplayStore();
+  const { showPlayerList, mapView, replayData, eventMode, currentEventId, setEventMode, setCurrentEventId } = useReplayStore();
+
+  // Auto-detect event from replay data
+  useEffect(() => {
+    if (!replayData) {
+      setEventMode(false);
+      setCurrentEventId(null);
+      return;
+    }
+
+    // Check metadata for event type
+    const detectedEventId = replayData.metadata.eventType as LiveEventId | undefined;
+    if (detectedEventId && LIVE_EVENTS[detectedEventId]) {
+      setCurrentEventId(detectedEventId);
+      setEventMode(true);
+      return;
+    }
+
+    // Try to detect from filename or other metadata
+    const filename = replayData.metadata.filename || '';
+    const eventName = replayData.metadata.eventName || '';
+    const detectedFromText = detectLiveEventFromReplayText(`${filename} ${eventName}`);
+    
+    if (detectedFromText && LIVE_EVENTS[detectedFromText]) {
+      setCurrentEventId(detectedFromText);
+      setEventMode(true);
+    } else {
+      setEventMode(false);
+      setCurrentEventId(null);
+    }
+  }, [replayData, setEventMode, setCurrentEventId]);
 
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-fn-darker">
       {/* The map owns the entire viewport now; all UI floats above it. */}
       <div className="absolute inset-0">
-        <Map3D />
+        {eventMode && currentEventId ? (
+          <EventReplaySystem eventId={currentEventId} />
+        ) : (
+          <EnhancedMap3D eventId={currentEventId || undefined} />
+        )}
         {mapView === 'explore' && <MapExplorer />}
       </div>
 
@@ -56,6 +105,20 @@ export default function ReplayViewer() {
       {/* Floating analysis dock; it disappears on smaller screens to preserve map scale. */}
       {mapView === '3d' && showPlayerList && (
         <aside className="pointer-events-auto absolute bottom-28 left-4 top-16 z-30 hidden w-80 flex-col overflow-hidden rounded-2xl border border-white/10 bg-fn-darker/80 shadow-2xl shadow-black/40 backdrop-blur-xl lg:flex">
+          {eventMode && (
+            <div className="bg-fn-purple/10 px-4 py-2 text-center">
+              <span className="text-xs font-bold uppercase tracking-wider text-fn-purple">Event Mode Active</span>
+              <button
+                onClick={() => {
+                  setEventMode(false);
+                  setCurrentEventId(null);
+                }}
+                className="ml-2 rounded bg-fn-purple/20 px-2 py-1 text-xs hover:bg-fn-purple/30"
+              >
+                Exit Event
+              </button>
+            </div>
+          )}
           <div className="flex border-b border-white/10 bg-black/20">
             <button
               onClick={() => setSidebarTab('players')}

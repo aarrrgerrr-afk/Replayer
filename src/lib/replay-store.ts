@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { ReplayData, PlayerState, KillEvent } from './types';
 import type { SeasonId } from './map-presets';
+import type { LiveEventId } from './event-presets';
 import { normalizeReplayIdentities, getFallbackPlayerName } from './player-identity';
 
 interface ReplayStore {
@@ -30,6 +31,10 @@ interface ReplayStore {
   activeSeason: SeasonId;
   mapView: '3d' | 'explore';
   cameraMode: 'free' | 'player' | 'top';
+  
+  // Event mode
+  eventMode: boolean;
+  currentEventId: LiveEventId | null;
 
   // Derived data
   currentFrame: PlayerState[];
@@ -59,6 +64,8 @@ interface ReplayStore {
   toggleTerrain: () => void;
   setActiveSeason: (season: SeasonId) => void;
   setMapView: (view: '3d' | 'explore') => void;
+  setEventMode: (mode: boolean) => void;
+  setCurrentEventId: (eventId: LiveEventId | null) => void;
   reset: () => void;
 }
 
@@ -156,6 +163,8 @@ export const useReplayStore = create<ReplayStore>((set, get) => ({
   activeSeason: 'c5s1',
   mapView: '3d',
   cameraMode: 'free',
+  eventMode: false,
+  currentEventId: null,
 
   currentFrame: [],
   currentStorm: undefined,
@@ -228,6 +237,8 @@ export const useReplayStore = create<ReplayStore>((set, get) => ({
   toggleTerrain: () => set((s) => ({ showTerrain: !s.showTerrain })),
   setActiveSeason: (season) => set({ activeSeason: season }),
   setMapView: (view) => set({ mapView: view }),
+  setEventMode: (mode) => set({ eventMode: mode }),
+  setCurrentEventId: (eventId) => set({ currentEventId: eventId }),
 
   reset: () =>
     set({
@@ -247,6 +258,8 @@ export const useReplayStore = create<ReplayStore>((set, get) => ({
       showTerrain: true,
       activeSeason: 'c5s1',
       mapView: '3d',
+      eventMode: false,
+      currentEventId: null,
       currentFrame: [],
       currentStorm: undefined,
       recentKills: [],

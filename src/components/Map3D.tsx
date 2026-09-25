@@ -720,7 +720,7 @@ function DeviceEventScene({ time }: { time: number }) {
   const progress = getDeviceEventProgress(time);
   const activation = Math.max(0, Math.min(1, (time - 150) / 270));
   const pulse = Math.max(0, Math.min(1, (time - 570) / 120));
-  const device = w2s(THE_DEVICE_EVENT.deviceCenter, 0.08);
+  const device = w2s(THE_DEVICE_EVENT.deviceCenter || { x: -8000, y: 80, z: -20000 }, 0.08);
   const armAngles = [0, Math.PI / 2, Math.PI, Math.PI * 1.5];
   const beamRadius = 2.2 + progress * 1.1;
   const beamOpacity = Math.max(0, Math.min(0.85, (time - 360) / 130));
