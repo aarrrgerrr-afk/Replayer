@@ -12,6 +12,7 @@ import MapOverlay from './MapOverlay';
 import LiveEventPanel from './LiveEventPanel';
 import MapExplorer from './MapExplorer';
 import EventReplaySystem from './EventReplaySystem';
+import RealFortniteMap from './RealFortniteMap';
 import { useReplayStore } from '@/lib/replay-store';
 import { detectLiveEventFromReplayText, type LiveEventId, LIVE_EVENTS } from '@/lib/event-presets';
 
@@ -84,7 +85,7 @@ export default function ReplayViewer() {
         {eventMode && currentEventId ? (
           <EventReplaySystem eventId={currentEventId} />
         ) : (
-          <EnhancedMap3D eventId={currentEventId || undefined} />
+          <RealFortniteMap useArchiveSurface={true} />
         )}
         {mapView === 'explore' && <MapExplorer />}
       </div>
