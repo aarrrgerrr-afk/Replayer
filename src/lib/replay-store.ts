@@ -30,7 +30,7 @@ interface ReplayStore {
   showTerrain: boolean;
   activeSeason: SeasonId;
   mapView: '3d' | 'explore';
-  cameraMode: 'free' | 'player' | 'top';
+  cameraMode: 'free' | 'player' | 'top' | 'first-person' | 'third-person';
   
   // Event mode
   eventMode: boolean;
@@ -53,7 +53,7 @@ interface ReplayStore {
   tick: (deltaTime: number) => void;
   selectPlayer: (id: number | null) => void;
   setFollowPlayer: (follow: boolean) => void;
-  setCameraMode: (mode: 'free' | 'player' | 'top') => void;
+  setCameraMode: (mode: 'free' | 'player' | 'top' | 'first-person' | 'third-person') => void;
   toggleKillFeed: () => void;
   toggleMinimap: () => void;
   togglePlayerList: () => void;

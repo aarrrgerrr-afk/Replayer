@@ -42,6 +42,19 @@ const Map3D = dynamic(() => import('./Map3D'), {
   ),
 });
 
+const Ultimate3DMap = dynamic(() => import('./Ultimate3DMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full w-full items-center justify-center bg-fn-darker">
+      <div className="text-center">
+        <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-fn-purple/30 border-t-fn-purple" />
+        <p className="font-medium text-fn-purple">Loading Ultimate 3D Map...</p>
+        <p className="mt-1 text-sm text-fn-gray">Building 3D terrain, buildings, and player models</p>
+      </div>
+    </div>
+  ),
+});
+
 type SidebarTab = 'players' | 'events';
 
 export default function ReplayViewer() {
@@ -85,7 +98,7 @@ export default function ReplayViewer() {
         {eventMode && currentEventId ? (
           <EventReplaySystem eventId={currentEventId} />
         ) : (
-          <RealFortniteMap useArchiveSurface={true} />
+          <Ultimate3DMap useArchiveSurface={true} />
         )}
         {mapView === 'explore' && <MapExplorer />}
       </div>
