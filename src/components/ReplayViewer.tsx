@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Header from './Header';
-import PlayerControls from './PlayerControls';
 import PlayerList from './PlayerList';
 import EventTimeline from './EventTimeline';
 import KillFeed from './KillFeed';
@@ -12,6 +11,7 @@ import MapOverlay from './MapOverlay';
 import LiveEventPanel from './LiveEventPanel';
 import MapExplorer from './MapExplorer';
 import EventReplaySystem from './EventReplaySystem';
+import EnhancedTimeline from './EnhancedTimeline';
 import RealFortniteMap from './RealFortniteMap';
 import { useReplayStore } from '@/lib/replay-store';
 import { detectLiveEventFromReplayText, type LiveEventId, LIVE_EVENTS } from '@/lib/event-presets';
@@ -59,7 +59,7 @@ type SidebarTab = 'players' | 'events';
 
 export default function ReplayViewer() {
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>('players');
-  const { showPlayerList, mapView, replayData, eventMode, currentEventId, setEventMode, setCurrentEventId } = useReplayStore();
+  const { showPlayerList, mapView, replayData, eventMode, currentEventId, setEventMode, setCurrentEventId, showVictoryScreen } = useReplayStore();
 
   // Auto-detect event from replay data
   useEffect(() => {
@@ -164,7 +164,7 @@ export default function ReplayViewer() {
       {/* Playback deck */}
       {mapView === '3d' && (
         <div className="pointer-events-auto absolute inset-x-0 bottom-0 z-40">
-          <PlayerControls />
+          <EnhancedTimeline />
         </div>
       )}
     </div>

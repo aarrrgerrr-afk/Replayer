@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { Play, MapPin, Clock, Users, Gamepad2, Trophy, Skull, Zap } from 'lucide-react';
+import { Play, MapPin, Clock, Users, Gamepad2, Trophy, Skull, Zap, Crosshair } from 'lucide-react';
 import { useReplayStore } from '@/lib/replay-store';
 import { getMapPreset } from '@/lib/map-presets';
 
@@ -40,6 +40,12 @@ export default function Header() {
   }, [kills]);
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+
+  // Calculate match stats
+  const totalDamage = kills.reduce((sum, k) => sum + (k.damage || 150), 0);
+  const avgKillDistance = kills.length > 0 
+    ? Math.round(kills.reduce((sum, k) => sum + k.distance, 0) / kills.length) 
+    : 0;
 
   return (
     <div className="bg-fn-darker/90 backdrop-blur-md border-b border-fn-border/30 px-4 py-2.5 flex items-center justify-between z-30 relative">
@@ -118,6 +124,20 @@ export default function Header() {
             />
           </div>
           <span className="text-[10px] text-fn-gray font-mono">{Math.round(progress)}%</span>
+        </div>
+
+        {/* Additional stats */}
+        <div className="hidden lg:flex items-center gap-2">
+          <div className="flex items-center gap-1 bg-fn-card/50 rounded-lg px-2 py-1 border border-fn-border/30">
+            <Zap className="w-3 h-3 text-fn-orange" />
+            <span className="text-[10px] font-mono text-fn-white">{totalDamage}</span>
+            <span className="text-[8px] text-fn-gray">dmg</span>
+          </div>
+          <div className="flex items-center gap-1 bg-fn-card/50 rounded-lg px-2 py-1 border border-fn-border/30">
+            <Crosshair className="w-3 h-3 text-fn-gold" />
+            <span className="text-[10px] font-mono text-fn-white">{avgKillDistance}m</span>
+            <span className="text-[8px] text-fn-gray">avg</span>
+          </div>
         </div>
       </div>
 

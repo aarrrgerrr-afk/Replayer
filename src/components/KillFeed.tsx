@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Skull, Crosshair } from 'lucide-react';
+import { Skull, Crosshair, Zap } from 'lucide-react';
 import { useReplayStore } from '@/lib/replay-store';
 import type { KillEvent } from '@/lib/types';
 import { getFallbackPlayerName } from '@/lib/player-identity';
@@ -37,6 +37,12 @@ function KillItem({ kill, index }: { kill: KillEvent; index: number }) {
         <span className="text-[8px] text-fn-gray/50 truncate max-w-[60px]">
           {kill.weapon}
         </span>
+        {kill.damage && (
+          <div className="flex items-center gap-0.5">
+            <Zap className="w-2 h-2 text-fn-orange" />
+            <span className="text-[8px] text-fn-orange font-mono">{kill.damage}</span>
+          </div>
+        )}
       </div>
 
       {/* Victim */}
@@ -55,7 +61,6 @@ export default function KillFeed() {
 
   useEffect(() => {
     if (recentKills.length > 0) {
-      // Merge new kills, avoid duplicates
       setDisplayedKills((prev) => {
         const existingIds = new Set(prev.map((k) => `${k.killer}-${k.victim}-${k.time}`));
         const newKills = recentKills.filter(
@@ -66,7 +71,6 @@ export default function KillFeed() {
     }
   }, [recentKills]);
 
-  // Clear old kills after a delay
   useEffect(() => {
     const timer = setInterval(() => {
       setDisplayedKills((prev) => {
@@ -80,7 +84,7 @@ export default function KillFeed() {
   if (!showKillFeed || displayedKills.length === 0) return null;
 
   return (
-    <div className="absolute top-4 right-4 z-20 pointer-events-none max-w-[300px]">
+    <div className="absolute top-4 right-4 z-20 pointer-events-none max-w-[320px]">
       <AnimatePresence>
         {displayedKills.map((kill, i) => (
           <KillItem key={`${kill.killer}-${kill.victim}-${kill.time}`} kill={kill} index={i} />

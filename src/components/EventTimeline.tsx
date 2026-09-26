@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Zap, Wind, Trophy, Target, Skull, ChevronDown, ChevronUp } from 'lucide-react';
+import { Clock, Zap, Wind, Trophy, Target, Skull, ChevronDown, ChevronUp, Bookmark } from 'lucide-react';
 import { useReplayStore } from '@/lib/replay-store';
 import type { KillEvent, GameEvent } from '@/lib/types';
 
@@ -52,6 +52,7 @@ function KillCard({ kill, isRecent }: { kill: KillEvent; isRecent: boolean }) {
           <span>•</span>
           <span>{kill.distance}m</span>
           {kill.isHeadshot && <span className="text-fn-gold">🎯 Headshot</span>}
+          {kill.damage && <span className="text-fn-orange">⚡ {kill.damage} dmg</span>}
         </div>
       </div>
       <span className="text-[10px] font-mono text-fn-gray">{formatTime(kill.time)}</span>
@@ -102,9 +103,33 @@ function WorldEventCard({ event }: { event: GameEvent }) {
   );
 }
 
+function BookmarkCard({ bookmark }: { bookmark: import('@/lib/types').Bookmark }) {
+  const { seekToBookmark, removeBookmark } = useReplayStore();
+
+  return (
+    <div
+      onClick={() => seekToBookmark(bookmark.id)}
+      className="flex cursor-pointer items-center gap-2 rounded-lg border border-fn-gold/20 bg-fn-gold/5 px-3 py-2 transition-colors hover:bg-fn-gold/10"
+    >
+      <Bookmark className="w-3.5 h-3.5 text-fn-gold" />
+      <span className="text-xs font-medium text-fn-gold">{bookmark.label}</span>
+      <span className="ml-auto text-[10px] font-mono text-fn-gray/50">{formatTime(bookmark.time)}</span>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          removeBookmark(bookmark.id);
+        }}
+        className="text-fn-gray/40 hover:text-fn-red text-xs"
+      >
+        ×
+      </button>
+    </div>
+  );
+}
+
 // ─── Main Event Timeline Panel ─────────────────────────────────────────
 export default function EventTimeline() {
-  const { replayData, currentTime, duration } = useReplayStore();
+  const { replayData, currentTime, duration, bookmarks, showBookmarks } = useReplayStore();
   const [isExpanded, setIsExpanded] = React.useState(true);
   const [filter, setFilter] = React.useState<'all' | 'kills' | 'storm'>('all');
 
@@ -197,6 +222,16 @@ export default function EventTimeline() {
               </button>
             ))}
           </div>
+
+          {/* Bookmarks */}
+          {showBookmarks && bookmarks.length > 0 && (
+            <div className="px-3 py-2 space-y-1 border-b border-fn-border/20">
+              <div className="text-[10px] text-fn-gray/60 uppercase tracking-wider mb-1">Bookmarks</div>
+              {bookmarks.slice(0, 5).map((bookmark) => (
+                <BookmarkCard key={bookmark.id} bookmark={bookmark} />
+              ))}
+            </div>
+          )}
 
           {/* Storm phases */}
           {filter !== 'kills' && (

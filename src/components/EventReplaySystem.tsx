@@ -372,15 +372,46 @@ function CollisionStructure({ time, theme }: { time: number; theme: MapTheme }) 
 
 // Camera Controller for event mode
 function EventCameraController({ eventId, currentTime }: { eventId: string; currentTime: number }) {
-  const { cameraMode, selectedPlayerId, currentFrame } = useReplayStore();
+  const { cameraMode, selectedPlayerId, currentFrame, deathCamTarget, followPlayer } = useReplayStore();
   const { camera } = useThree();
   const targetPosition = useRef(new THREE.Vector3(2.8, 4.5, 2.8));
+  const targetLookAt = useRef(new THREE.Vector3(0, 0, 0));
 
   useFrame(() => {
     if (cameraMode === 'top') {
       targetPosition.current.set(0, 9.2, 0.01);
+      targetLookAt.current.set(0, 0, 0);
       camera.position.lerp(targetPosition.current, 0.055);
-      camera.lookAt(0, 0, 0);
+      camera.lookAt(targetLookAt.current);
+      return;
+    }
+
+    if (cameraMode === 'cinematic') {
+      const event = getEventById(eventId as any);
+      const phase = event?.phases.find((p) => currentTime >= p.start && currentTime < p.end) || event?.phases[event.phases.length - 1];
+      if (phase?.cameraFocus) {
+        targetPosition.current.set(
+          phase.cameraFocus.x * SCALE,
+          phase.cameraFocus.y * SCALE * 0.05 + 0.5,
+          phase.cameraFocus.z * SCALE
+        );
+        targetLookAt.current.set(
+          (phase.cameraFocus.x || 0) * SCALE,
+          0.1,
+          (phase.cameraFocus.z || 0) * SCALE
+        );
+      }
+      camera.position.lerp(targetPosition.current, 0.02);
+      camera.lookAt(targetLookAt.current);
+      return;
+    }
+
+    if (cameraMode === 'death-cam' && deathCamTarget) {
+      const pos = w2s(deathCamTarget.position, 0.2);
+      targetPosition.current.set(pos[0] + 0.3, pos[1] + 0.2, pos[2] + 0.3);
+      targetLookAt.current.set(pos[0], pos[1], pos[2]);
+      camera.position.lerp(targetPosition.current, 0.05);
+      camera.lookAt(targetLookAt.current);
       return;
     }
 
@@ -388,9 +419,43 @@ function EventCameraController({ eventId, currentTime }: { eventId: string; curr
       const player = currentFrame.find((candidate) => candidate.id === selectedPlayerId);
       if (player?.isAlive) {
         const position = w2s(player.position, 0.14);
-        targetPosition.current.set(position[0] + 0.32, position[1] + 0.22, position[2] + 0.32);
+        if (followPlayer) {
+          targetPosition.current.set(position[0] + 0.32, position[1] + 0.22, position[2] + 0.32);
+          targetLookAt.current.set(position[0], position[1], position[2]);
+        }
         camera.position.lerp(targetPosition.current, 0.045);
-        camera.lookAt(position[0], position[1], position[2]);
+        camera.lookAt(targetLookAt.current);
+      }
+    }
+
+    if (cameraMode === 'first-person' && selectedPlayerId !== null) {
+      const player = currentFrame.find((candidate) => candidate.id === selectedPlayerId);
+      if (player?.isAlive) {
+        const position = w2s(player.position, 0.18);
+        targetPosition.current.set(position[0], position[1] + 0.05, position[2]);
+        targetLookAt.current.set(
+          position[0] + Math.sin(player.rotation) * 10,
+          position[1],
+          position[2] + Math.cos(player.rotation) * 10
+        );
+        camera.position.lerp(targetPosition.current, 0.1);
+        camera.lookAt(targetLookAt.current);
+      }
+    }
+
+    if (cameraMode === 'third-person' && selectedPlayerId !== null) {
+      const player = currentFrame.find((candidate) => candidate.id === selectedPlayerId);
+      if (player?.isAlive) {
+        const position = w2s(player.position, 0.18);
+        const offset = 0.8;
+        targetPosition.current.set(
+          position[0] + Math.sin(player.rotation) * offset,
+          position[1] + 0.4,
+          position[2] + Math.cos(player.rotation) * offset
+        );
+        targetLookAt.current.set(position[0], position[1], position[2]);
+        camera.position.lerp(targetPosition.current, 0.06);
+        camera.lookAt(targetLookAt.current);
       }
     }
   });
@@ -498,6 +563,25 @@ export default function EventReplaySystem({ eventId }: EventReplaySystemProps) {
             />
           </React.Fragment>
         ))}
+
+        {/* Death markers */}
+        {showKillMarkers && kills.filter(k => k.time <= currentTime && k.time > currentTime - 30).map((kill, i) => {
+          const killer = currentFrame.find(p => p.id === kill.killerId);
+          const victim = currentFrame.find(p => p.id === kill.victimId);
+          const pos = victim?.position || killer?.position || { x: 0, y: 0, z: 0 };
+          const [x, y, z] = w2s(pos, 0.1);
+          return (
+            <group key={`death-${i}`} position={[x, y, z]}>
+              <mesh rotation={[-Math.PI / 2, 0, 0]}>
+                <ringGeometry args={[0.06, 0.09, 16]} />
+                <meshBasicMaterial color="#ff3355" transparent opacity={0.8} />
+              </mesh>
+              <Text position={[0, 0.15, 0]} fontSize={0.022} color="#ff3355" anchorX="center" anchorY="bottom" outlineWidth={0.002} outlineColor="#050508">
+                {kill.killer} 💀 {kill.victim}
+              </Text>
+            </group>
+          );
+        })}
 
         <EventCameraController eventId={eventId} currentTime={currentTime} />
         

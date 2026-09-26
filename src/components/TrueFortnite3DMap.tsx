@@ -601,10 +601,10 @@ function FortniteCameraController({
   currentFrame,
   setCameraMode
 }: {
-  cameraMode: 'free' | 'player' | 'top' | 'first-person' | 'third-person';
+  cameraMode: 'free' | 'player' | 'top' | 'first-person' | 'third-person' | 'cinematic' | 'death-cam';
   selectedPlayerId: number | null;
   currentFrame: PlayerState[];
-  setCameraMode: (mode: 'free' | 'player' | 'top' | 'first-person' | 'third-person') => void;
+  setCameraMode: (mode: 'free' | 'player' | 'top' | 'first-person' | 'third-person' | 'cinematic' | 'death-cam') => void;
 }) {
   const { camera } = useThree();
   const targetPosition = useRef(new THREE.Vector3());
