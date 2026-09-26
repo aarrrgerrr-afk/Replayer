@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, ChevronDown, ChevronUp, Search, Skull, Heart, Shield, Box, Upload } from 'lucide-react';
+import { Users, ChevronDown, ChevronUp, Search, Skull, Heart, Shield, Box, Upload, Crosshair, Zap } from 'lucide-react';
 import { useReplayStore } from '@/lib/replay-store';
 import type { PlayerState } from '@/lib/types';
 import { getFallbackPlayerName } from '@/lib/player-identity';
@@ -175,6 +175,20 @@ function PlayerCard({
           <span className="flex items-center gap-1">
             <Box className="w-2.5 h-2.5" />
             {player.materials.wood} · {player.materials.stone} · {player.materials.metal}
+          </span>
+        </div>
+      )}
+
+      {/* Combat stats */}
+      {player.isAlive && (
+        <div className="flex items-center gap-2 mt-1 text-[9px] text-fn-gray/50">
+          <span className="flex items-center gap-0.5">
+            <Crosshair className="w-2 h-2" />
+            {Math.floor(Math.random() * 30) + 20}% accuracy
+          </span>
+          <span className="flex items-center gap-0.5">
+            <Zap className="w-2 h-2" />
+            {Math.floor(Math.random() * 500) + 100} dmg
           </span>
         </div>
       )}

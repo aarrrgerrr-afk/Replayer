@@ -44,12 +44,33 @@ export interface KillEvent {
   weapon: string;
   distance: number;
   isHeadshot: boolean;
+  damage?: number;
 }
 
 export interface GameEvent {
   time: number;
   type: 'storm_circle' | 'supply_drop' | 'elimination' | 'zone_close' | 'game_start' | 'game_end' | 'player_marked';
   data: Record<string, unknown>;
+}
+
+export interface Bookmark {
+  id: string;
+  time: number;
+  label: string;
+  type: 'kill' | 'death' | 'highlight' | 'custom';
+  playerId?: number;
+}
+
+export interface PlayerStats {
+  playerId: number;
+  name: string;
+  kills: number;
+  damageDealt: number;
+  damageTaken: number;
+  headshots: number;
+  accuracy: number;
+  timeAlive: number;
+  placement: number;
 }
 
 export interface StormCircle {
