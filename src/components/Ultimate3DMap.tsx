@@ -624,6 +624,19 @@ function GameCameraController({
         camera.position.lerp(targetPosition.current, 0.05);
         camera.lookAt(0, 0, 0);
         break;
+      
+      case 'player':
+        // Player follow mode - smooth follow behind player
+        const followOffsetX = Math.sin(player.rotation) * 0.5;
+        const followOffsetZ = Math.cos(player.rotation) * 0.5;
+        targetPosition.current.set(
+          playerPos[0] - followOffsetX,
+          playerPos[1] + 0.35,
+          playerPos[2] - followOffsetZ
+        );
+        camera.position.lerp(targetPosition.current, 0.08);
+        camera.lookAt(playerPos[0], playerPos[1] + 0.1, playerPos[2]);
+        break;
         
       default: // free
         // OrbitControls handles this

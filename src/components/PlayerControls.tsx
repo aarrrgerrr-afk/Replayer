@@ -78,6 +78,12 @@ export default function PlayerControls() {
         case 'KeyT':
           setCameraMode('top');
           break;
+        case 'Key1':
+          setCameraMode('first-person');
+          break;
+        case 'Key3':
+          setCameraMode('third-person');
+          break;
         case 'Escape':
           reset();
           break;
@@ -263,6 +269,8 @@ export default function PlayerControls() {
               { mode: 'free' as const, icon: Camera, label: 'Free Cam', key: 'F' },
               { mode: 'player' as const, icon: Eye, label: 'Player View', key: 'V' },
               { mode: 'top' as const, icon: Map, label: 'Top Down', key: 'T' },
+              { mode: 'first-person' as const, icon: Eye, label: '1st Person', key: '1' },
+              { mode: 'third-person' as const, icon: Users, label: '3rd Person', key: '3' },
             ].map(({ mode, icon: Icon, label, key }) => (
               <button
                 key={mode}
