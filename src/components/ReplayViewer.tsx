@@ -42,14 +42,14 @@ const Map3D = dynamic(() => import('./Map3D'), {
   ),
 });
 
-const Ultimate3DMap = dynamic(() => import('./Ultimate3DMap'), {
+const TrueFortnite3DMap = dynamic(() => import('./TrueFortnite3DMap'), {
   ssr: false,
   loading: () => (
     <div className="flex h-full w-full items-center justify-center bg-fn-darker">
       <div className="text-center">
         <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-fn-purple/30 border-t-fn-purple" />
-        <p className="font-medium text-fn-purple">Loading Ultimate 3D Map...</p>
-        <p className="mt-1 text-sm text-fn-gray">Building 3D terrain, buildings, and player models</p>
+        <p className="font-medium text-fn-purple">Loading TRUE Fortnite 3D...</p>
+        <p className="mt-1 text-sm text-fn-gray">Real in-game quality replay experience</p>
       </div>
     </div>
   ),
@@ -98,7 +98,7 @@ export default function ReplayViewer() {
         {eventMode && currentEventId ? (
           <EventReplaySystem eventId={currentEventId} />
         ) : (
-          <Ultimate3DMap useArchiveSurface={true} />
+          <TrueFortnite3DMap useArchiveSurface={true} />
         )}
         {mapView === 'explore' && <MapExplorer />}
       </div>
